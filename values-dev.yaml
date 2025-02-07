@@ -5,12 +5,12 @@
 replicaCount: 1
 
 image:
-  repository: enterprisequay.hbctxdom.com/uam/uam-adapter-service
+  repository: us-central1-docker.pkg.dev/hbl-poc-enterprisefac-pm-prj/uam-adapter-registry/uam-adapter
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 
-imagePullSecrets: "docker-registry-secret"
+imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
@@ -38,7 +38,7 @@ podAnnotations: {
 }
 
 podSecurityContext: {}
-  # fsGroup: 2000
+# fsGroup: 2000
 
 securityContext:
   allowPrivilegeEscalation: false
@@ -52,17 +52,17 @@ securityContext:
 service:
   type: ClusterIP
   port: 10085
-  
+
 envFrom:
   uamAdapterConfigMap: uam-adapter-configmap
-  
+
 envValues:
   APPLICATION_NAME: "uam-adapter"
   APPLICATION_PORT: "10085"
   DAPR_SERVICE_ENABLE: 'true'
-  SPRING_DATASOURCE_URL: "jdbc:postgresql://35.222.149.6:5432/postgresdb?ApplicationName=uam-adapter&currentSchema=public"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://34.135.239.235:5432/postgresdb?ApplicationName=uam-adapter&currentSchema=public"
   SPRING_DATASOURCE_USERNAME: "admin"
-  KAFKA_BROKER: "HBLZKAFKAAZ1VM1.sangamkafkapreprod.hbctxdom.com:9092,HBLZKAFKAAZ2VM1.sangamkafkapreprod.hbctxdom.com:9092,HBLZKAFKAAZ3VM1.sangamkafkapreprod.hbctxdom.com:9092"
+  KAFKA_BROKER: "20.192.24.194:39092"
   KAFKA_CONSUMER_GROUP: "DAPR-DATAING-CONSUMER-GRP"
   KAFKA_CLIENT_ID: "dapr-pubsub-dataIng-id"
   KAFKA_AUTH_TYPE: "password"
@@ -110,29 +110,27 @@ envValues:
   EPRICE_CREATE_URL: "http://35.200.180.116:80/auth-user-service/auth/user/maintenance"
   EPRICE_MAINTAIN_URL: "http://35.200.180.116:80/auth-user-service/auth/user/maintenance/status"
   EPRICE_SEARCH_URL: "http://35.200.180.116:80/auth-user-service"
-  
-  
-  
+
 
 global:
   gcpServiceAccount:
     annotations:
-      iam.gke.io/gcp-service-account: service-account-name
-  uam-adapter-cloud-secret:
-    - fileName: "saslPassword.data"
-      resourceName: "projects/hbl-dev-imps-prj-spk-5a/secrets/hbl-gcp-dev-imps-as1-confluent-saslpassword-secret/versions/1"
-    - fileName: "caCert.data"
-      resourceName: "projects/hbl-dev-imps-prj-spk-5a/secrets/hbl-gcp-dev-imps-as1-confluent-cacert-secret/versions/1"
+      iam.gke.io/gcp-service-account: uam-epricing-sa@hbl-poc-enterprisefac-pm-prj.iam.gserviceaccount.com
+  uamcloudsecret:
     - fileName: "dbPassword.data"
-      resourceName: "projects/hbl-dev-imps-prj-spk-5a/secrets/hbl-gcp-dev-imps-as1-confluent-dbpassword-secret/versions/1"
-  
+      resourceName: "projects/664744740241/secrets/epricing-db-password/versions/1"
+  #   - fileName: "saslPassword.data"
+  #     resourceName: "projects/hbl-dev-imps-prj-spk-5a/secrets/hbl-gcp-dev-imps-as1-confluent-saslpassword-secret/versions/1"
+  #   - fileName: "caCert.data"
+  #     resourceName: "projects/hbl-dev-imps-prj-spk-5a/secrets/hbl-gcp-dev-imps-as1-confluent-cacert-secret/versions/1"
+
 
 ingress:
   enabled: false
   className: ""
   annotations: {}
     # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  # kubernetes.io/tls-acme: "true"
   hosts:
     - host: chart-example.local
       paths:
@@ -162,8 +160,14 @@ autoscaling:
   #targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
-nodeSelector: {}
+nodeSelector:
+  cloud.google.com/gke-nodepool: new-pool
+  #nodepool_type: data-ingestion
 
 tolerations: []
+  #- key: "helm_release"
+  # operator: "Equal"
+#value: "data-ingestion"
+#effect: "NoSchedule"
 
 affinity: {}
