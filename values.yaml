@@ -1,0 +1,167 @@
+# Default values for prarambh-um-adapter-helm.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: enterprisequay.hbctxdom.com/uam/uam-adapter-service
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+imagePullSecrets: "docker-registry-secret"
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: "workload-service-account"
+
+podAnnotations: {
+  dapr.io/enabled: 'true',
+  dapr.io/app-id: 'uam-adapter',
+  dapr.io/app-port: '10085',
+  dapr.io/sidecar-readiness-probe-threshold: '40',
+  dapr.io/sidecar-image: 'enterprisequay.hbctxdom.com/sangam/daprd:1.13.0',
+  dapr.io/graceful-shutdown-seconds: "300",
+  dapr.io/sidecar-cpu-request: '200m',
+  dapr.io/sidecar-cpu-limit: '500m',
+  dapr.io/sidecar-memory-request: '500Mi',
+  dapr.io/sidecar-memory-limit: '1Gi',
+  dapr.io/log-level: 'debug'
+}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 10005
+  runAsGroup: 10005
+  privileged: false
+  seccompProfile: RuntimeDefault
+
+service:
+  type: ClusterIP
+  port: 10085
+  
+envFrom:
+  uamAdapterConfigMap: uam-adapter-configmap
+  
+envValues:
+  APPLICATION_NAME: "uam-adapter"
+  APPLICATION_PORT: "10085"
+  DAPR_SERVICE_ENABLE: 'true'
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://35.222.149.6:5432/postgresdb?ApplicationName=uam-adapter&currentSchema=public"
+  SPRING_DATASOURCE_USERNAME: "admin"
+  KAFKA_BROKER: "HBLZKAFKAAZ1VM1.sangamkafkapreprod.hbctxdom.com:9092,HBLZKAFKAAZ2VM1.sangamkafkapreprod.hbctxdom.com:9092,HBLZKAFKAAZ3VM1.sangamkafkapreprod.hbctxdom.com:9092"
+  KAFKA_CONSUMER_GROUP: "DAPR-DATAING-CONSUMER-GRP"
+  KAFKA_CLIENT_ID: "dapr-pubsub-dataIng-id"
+  KAFKA_AUTH_TYPE: "password"
+  KAFKA_MAX_MSG_BYTES: "100000"
+  KAFKA_CONSUMER_RETRY_INTERVAL: "200ms"
+  KAFKA_VERSION: "1.0"
+  KAFKA_DISABLE_TLS: 'false'
+  KAFKA_AUTH_REQUIRED: 'false'
+  KAFKA_RETRY_INTERVAL: "10s"
+  KAFKA_MAX_RETRY_COUNT: "3"
+  KAFKA_SASL_MECHANISM: "SHA-512"
+  KAFKA_SASL_USERNAME: "KAFKA_SASL_USERNAME"
+  KAFKA_SASL: "scram_sha512"
+  KAFKA_TLS: "enable"
+  HIKARI_MIN_IDLE: "1"
+  HIKARI_MAX_IDLE: "0"
+  HIKARI_MAX_POOL_SIZE: "5"
+  HIKARI_POOL_NAME: "uam-adapter"
+  HIKARI_CONNECTION_TIME_OUT: "60000"
+  HIKARI_MAX_LIFETIME: "61000"
+  HIKARI_AUTO_COMMIT: 'false'
+  HIKARI_IDLE_TIME_OUT: "60000"
+  HIKARI_KEEP_ALIVE_TIME: "60000"
+  ERROR_TEMPLATE_QUERY: "select * from uam_error_code_mapping where uamerrorcode=:uamerrorcode"  
+  RULE_CONFIG_QUERY: "select rules from uam_mapping_rule where service_nm=:serviceNm and rule_purpose=:rulePurpose and version =:version"
+  ROUTING_TEMPLATE_QUERY: "select * from routing_decision_table where appName=:appname"
+  UAM_OPERATION_CREATE: "create"
+  UAM_OPERATION_MODIFY: "modify"
+  UAM_OPERATION_MAINTAIN: "mainatin"
+  UNDEFINED_ERROR_CODE: "99"
+  UNDEFINED_ERROR_MESSAGE: "Undefined Error-Contact UAM Adaptor support:"
+  X_REQUESTING_USER: "X-requesting-user"
+  X_REQUESTING_VALUE: "nikita"
+  UAM_METHOD_POST: "post"
+  UAM_METHOD_PUT: "put"
+  AUDIT_TEMPLATE_QUERY: "select ISACTICKETNO,APPLICATION_ID,UAM_ERROR_CODE,UAM_ERROR_MESSAGE from AUDIT_ADAPTER_EVENT where ISACTICKETNO=:iSACTicketNo"
+  PATH_TEMPLATE_QUERY: "select * from application_path where attribute=:attribute"
+  UAM_KAFKA_TOPIC: "uam_adapter_payloads"
+  RULE_CONFIG_VERSION: "0.0.1"
+  RULE_CONFIG_REQUEST: "userrequest"
+  RULE_CONFIG_MAINTAIN: "usermaintain"
+  KAFKA_PUBSUBNAME: "kafka-uam-adapter-pubsub"
+  DEFAULT_CREATE_URL: "http://35.200.180.116:80/auth-user-service/auth/user/maintenance"
+  DEFAULT_MAINTAIN_URL: "http://35.200.180.116:80/auth-user-service/auth/user/maintenance/status"
+  EPRICE_CREATE_URL: "http://35.200.180.116:80/auth-user-service/auth/user/maintenance"
+  EPRICE_MAINTAIN_URL: "http://35.200.180.116:80/auth-user-service/auth/user/maintenance/status"
+  EPRICE_SEARCH_URL: "http://35.200.180.116:80/auth-user-service"
+  
+
+global:
+  gcpServiceAccount:
+    annotations:
+      iam.gke.io/gcp-service-account: service-account-name
+  uam-adapter-cloud-secret:
+    - fileName: "saslPassword.data"
+      resourceName: "projects/hbl-dev-imps-prj-spk-5a/secrets/hbl-gcp-dev-imps-as1-confluent-saslpassword-secret/versions/1"
+    - fileName: "caCert.data"
+      resourceName: "projects/hbl-dev-imps-prj-spk-5a/secrets/hbl-gcp-dev-imps-as1-confluent-cacert-secret/versions/1"
+    - fileName: "dbPassword.data"
+      resourceName: "projects/hbl-dev-imps-prj-spk-5a/secrets/hbl-gcp-dev-imps-as1-confluent-dbpassword-secret/versions/1"
+  
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+    cpu: 500m
+    memory: 1000Mi
+  requests:
+    cpu: 250m
+    memory: 500Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 1
+  #targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
