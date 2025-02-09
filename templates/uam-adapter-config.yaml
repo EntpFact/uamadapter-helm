@@ -4,35 +4,35 @@ metadata:
   name: uam-adapter-configmap
 data:
   port: {{ .Values.service.port | quote }}
-  application_name:  {{ .Values.envValues.APPLICATION_NAME }}
+  application_name: {{ .Values.envValues.APPLICATION_NAME | quote }}
   dapr_service_enable: {{ .Values.envValues.DAPR_SERVICE_ENABLE | quote }}
-  db_datasource_url: {{ .Values.envValues.SPRING_DATASOURCE_URL }}
-  db_user_name: {{ .Values.envValues.SPRING_DATASOURCE_USERNAME }}
-  hikari_min_idle: {{ .Values.envValues.HIKARI_MIN_IDLE }}
-  hikari_max_idle: {{ .Values.envValues.HIKARI_MAX_IDLE }}
-  hikari_max_pool_size: {{ .Values.envValues.HIKARI_MAX_POOL_SIZE }}
-  hikari_pool_name: {{ .Values.envValues.HIKARI_POOL_NAME }}
-  hikari_connection_time_out: {{ .Values.envValues.HIKARI_CONNECTION_TIME_OUT }}
-  hikari_max_life_time: {{ .Values.envValues.HIKARI_MAX_LIFETIME }}
+  db_datasource_url: {{ .Values.envValues.SPRING_DATASOURCE_URL | quote }}
+  db_user_name: {{ .Values.envValues.SPRING_DATASOURCE_USERNAME | quote }}
+  hikari_min_idle: {{ .Values.envValues.HIKARI_MIN_IDLE | quote }}
+  hikari_max_idle: {{ .Values.envValues.HIKARI_MAX_IDLE | quote }}
+  hikari_max_pool_size: {{ .Values.envValues.HIKARI_MAX_POOL_SIZE | quote }}
+  hikari_pool_name: {{ .Values.envValues.HIKARI_POOL_NAME | quote }}
+  hikari_connection_time_out: {{ .Values.envValues.HIKARI_CONNECTION_TIME_OUT | quote }}
+  hikari_max_life_time: {{ .Values.envValues.HIKARI_MAX_LIFETIME | quote }}
   hikari_auto_commit: {{ .Values.envValues.HIKARI_AUTO_COMMIT | quote }}
-  hikari_idle_time_out: {{ .Values.envValues.HIKARI_IDLE_TIME_OUT }}
-  hikari_keep_alive_time: {{ .Values.envValues.HIKARI_KEEP_ALIVE_TIME }}
-  error_template_query: {{ .Values.envValues.ERROR_TEMPLATE_QUERY }}  
-  rule_config_query: {{ .Values.envValues.RULE_CONFIG_QUERY }}
-  routing_template_query: {{ .Values.envValues.ROUTING_TEMPLATE_QUERY }}
-  uam_operation_create: {{ .Values.envValues.UAM_OPERATION_CREATE }}
-  uam_operation_modify: {{ .Values.envValues.UAM_OPERATION_MODIFY }}
-  uam_operation_maintain: {{ .Values.envValues.UAM_OPERATION_MAINTAIN }}
-  undefined_error_code: {{ .Values.envValues.UNDEFINED_ERROR_CODE }}
-  undefined_error_msg: {{ .Values.envValues.UNDEFINED_ERROR_MESSAGE }}
-  x_requesting_user: {{ .Values.envValues.X_REQUESTING_USER }}
-  x_requesting_value: {{ .Values.envValues.X_REQUESTING_VALUE }}
-  uam_method_post: {{ .Values.envValues.UAM_METHOD_POST }}
-  uam_method_put: {{ .Values.envValues.UAM_METHOD_PUT }}
-  audit_template_query: {{ .Values.envValues.AUDIT_TEMPLATE_QUERY }}
-  path_template_query: {{ .Values.envValues.PATH_TEMPLATE_QUERY }}
-  uam_kafka_topic: {{ .Values.envValues.UAM_KAFKA_TOPIC }}
-  rule_config_version: {{ .Values.envValues.RULE_CONFIG_VERSION }}
-  rule_config_request: {{ .Values.envValues.RULE_CONFIG_REQUEST }}
-  rule_config_maintain: {{ .Values.envValues.RULE_CONFIG_MAINTAIN }}
-  kafka_pubsubname: {{ .Values.envValues.KAFKA_PUBSUBNAME }}
+  hikari_idle_time_out: {{ .Values.envValues.HIKARI_IDLE_TIME_OUT | quote }}
+  hikari_keep_alive_time: {{ .Values.envValues.HIKARI_KEEP_ALIVE_TIME | quote }}
+  error_template_query: {{ .Values.envValues.ERROR_TEMPLATE_QUERY | quote }}
+  rule_config_query: {{ .Values.envValues.RULE_CONFIG_QUERY | quote }}
+  routing_template_query: {{ .Values.envValues.ROUTING_TEMPLATE_QUERY | quote }}
+  uam_operation_create: {{ .Values.envValues.UAM_OPERATION_CREATE | quote }}
+  uam_operation_modify: {{ .Values.envValues.UAM_OPERATION_MODIFY | quote }}
+  uam_operation_maintain: {{ .Values.envValues.UAM_OPERATION_MAINTAIN | quote }}
+  undefined_error_code: {{ .Values.envValues.UNDEFINED_ERROR_CODE | quote }}
+  undefined_error_msg: {{ .Values.envValues.UNDEFINED_ERROR_MESSAGE | quote }}
+  x_requesting_user: {{ .Values.envValues.X_REQUESTING_USER | quote }}
+  x_requesting_value: {{ .Values.envValues.X_REQUESTING_VALUE | quote }}
+  uam_method_post: {{ .Values.envValues.UAM_METHOD_POST | quote }}
+  uam_method_put: {{ .Values.envValues.UAM_METHOD_PUT | quote }}
+  audit_template_query: {{ .Values.envValues.AUDIT_TEMPLATE_QUERY | quote }}
+  path_template_query: {{ .Values.envValues.PATH_TEMPLATE_QUERY | quote }}
+  uam_kafka_topic: {{ .Values.envValues.UAM_KAFKA_TOPIC | quote }}
+  rule_config_version: {{ .Values.envValues.RULE_CONFIG_VERSION | quote }}
+  rule_config_request: {{ .Values.envValues.RULE_CONFIG_REQUEST | quote }}
+  rule_config_maintain: {{ .Values.envValues.RULE_CONFIG_MAINTAIN | quote }}
+  kafka_pubsubname: {{ .Values.envValues.KAFKA_PUBSUBNAME | quote }}

@@ -24,7 +24,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "prarambh-uam-adapter-helm.serviceAccountName" . }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -48,18 +48,18 @@ spec:
                   name: uam-adapter-cloud-secret
           ports:
             - name: http
-              containerPort: {{ .Values.service.port | quote }}
+              containerPort: {{ .Values.service.port | int }}
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /healthz
-              port: {{ .Values.service.port | quote }}
+              port: {{ .Values.service.port | int }}
             initialDelaySeconds: 10
             periodSeconds: 5
           readinessProbe:
             httpGet:
               path: /ready
-              port: {{ .Values.service.port | quote }}
+              port: {{ .Values.service.port | int }}
             initialDelaySeconds: 20
             periodSeconds: 5
           resources:

@@ -21,7 +21,7 @@ serviceAccount:
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: "workload-service-account"
+  name: workload-service-account
 
 podAnnotations: {
   dapr.io/enabled: 'true',
@@ -47,7 +47,8 @@ securityContext:
   runAsUser: 10005
   runAsGroup: 10005
   privileged: false
-  seccompProfile: RuntimeDefault
+  seccompProfile:
+    type: RuntimeDefault
 
 service:
   type: ClusterIP
@@ -60,7 +61,7 @@ envValues:
   APPLICATION_NAME: "uam-adapter"
   APPLICATION_PORT: "10085"
   DAPR_SERVICE_ENABLE: 'true'
-  SPRING_DATASOURCE_URL: "jdbc:postgresql://34.135.239.235:5432/postgresdb?ApplicationName=uam-adapter&currentSchema=public"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://35.222.149.6:5432/postgresdb?ApplicationName=uam-adapter&currentSchema=public"
   SPRING_DATASOURCE_USERNAME: "admin"
   KAFKA_BROKER: "20.192.24.194:39092"
   KAFKA_CONSUMER_GROUP: "DAPR-DATAING-CONSUMER-GRP"
@@ -118,7 +119,7 @@ global:
       iam.gke.io/gcp-service-account: uam-epricing-sa@hbl-poc-enterprisefac-pm-prj.iam.gserviceaccount.com
   uamcloudsecret:
     - fileName: "dbPassword.data"
-      resourceName: "projects/664744740241/secrets/epricing-db-password/versions/1"
+      resourceName: "projects/664744740241/secrets/epricing-db-password/versions/2"
   #   - fileName: "saslPassword.data"
   #     resourceName: "projects/hbl-dev-imps-prj-spk-5a/secrets/hbl-gcp-dev-imps-as1-confluent-saslpassword-secret/versions/1"
   #   - fileName: "caCert.data"

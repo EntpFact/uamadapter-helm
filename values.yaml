@@ -21,7 +21,7 @@ serviceAccount:
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: "uam-epricing-sa@hbl-poc-enterprisefac-pm-prj.iam.gserviceaccount.com"
+  name: workload-service-account
 
 podAnnotations: {
   dapr.io/enabled: 'true',
@@ -47,7 +47,8 @@ securityContext:
   runAsUser: 10005
   runAsGroup: 10005
   privileged: false
-  seccompProfile: RuntimeDefault
+  seccompProfile:
+    type: RuntimeDefault
 
 service:
   type: ClusterIP

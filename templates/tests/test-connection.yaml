@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "{{ include "prarambh-um-adapter-helm.fullname" . }}-test-connection"
+  name: "{{ include "prarambh-uam-adapter-helm.fullname" . }}-test-connection"
   labels:
-    {{- include "prarambh-um-adapter-helm.labels" . | nindent 4 }}
+    {{- include "prarambh-uam-adapter-helm.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": test
 spec:
@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "prarambh-um-adapter-helm.fullname" . }}:{{ .Values.service.port }}']
+      args: ['{{ include "prarambh-uam-adapter-helm.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never
