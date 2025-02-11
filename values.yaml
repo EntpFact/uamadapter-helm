@@ -21,21 +21,23 @@ serviceAccount:
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: workload-service-account
+  name: "uam-epricing-sa@hbl-poc-enterprisefac-pm-prj.iam.gserviceaccount.com"
 
 podAnnotations: {
   dapr.io/enabled: 'true',
   dapr.io/app-id: 'uam-adapter',
   dapr.io/app-port: '10085',
   dapr.io/sidecar-readiness-probe-threshold: '40',
-  dapr.io/sidecar-image: 'enterprisequay.hbctxdom.com/sangam/daprd:1.13.0',
+  dapr.io/sidecar-image: 'us-central1-docker.pkg.dev/hbl-poc-enterprisefac-pm-prj/data-ingestion-repo/daprd:1.14.4',
   dapr.io/graceful-shutdown-seconds: "300",
   dapr.io/sidecar-cpu-request: '200m',
   dapr.io/sidecar-cpu-limit: '500m',
   dapr.io/sidecar-memory-request: '500Mi',
   dapr.io/sidecar-memory-limit: '1Gi',
-  dapr.io/log-level: 'debug'
+  dapr.io/log-level: 'debug',
+  dapr.io/log-as-json: 'true'
 }
+
 
 podSecurityContext: {}
   # fsGroup: 2000
@@ -47,39 +49,51 @@ securityContext:
   runAsUser: 10005
   runAsGroup: 10005
   privileged: false
-  seccompProfile:
-    type: RuntimeDefault
+  seccompProfile: RuntimeDefault
 
 service:
-  type: ClusterIP
+  #type: ClusterIP
+  type: LoadBalancer
   port: 10085
   
 envFrom:
   uamAdapterConfigMap: uam-adapter-configmap
-  
+
 envValues:
   APPLICATION_NAME: "uam-adapter"
   APPLICATION_PORT: "10085"
+  PORT: "10085"
   DAPR_SERVICE_ENABLE: 'true'
-  SPRING_DATASOURCE_URL: "jdbc:postgresql://35.222.149.6:5432/postgresdb?ApplicationName=uam-adapter&currentSchema=public"
-  SPRING_DATASOURCE_USERNAME: "admin"
+# SPRING_DATASOURCE_URL: "jdbc:postgresql://34.135.239.235:5432/postgresdb?ApplicationName=uam-adapter&currentSchema=public"
+# SPRING_DATASOURCE_USERNAME: "admin"
+  DB_HOST: "34.135.239.235"
+  DB_PORT: "5432"
+  DB_DATABASE_NAME: "postgresdb"
+  DB_SCHEMA_NAME: "public"
+  DB_USER_NAME: "admin"
+  SPRING_DATASOURCE_DRIVERCLASSNAME: "org.postgresql.Driver"
+  
+  
   KAFKA_BROKER: "20.192.24.194:39092"
-  KAFKA_CONSUMER_GROUP: "DAPR-DATAING-CONSUMER-GRP"
-  KAFKA_CLIENT_ID: "dapr-pubsub-dataIng-id"
-  KAFKA_AUTH_TYPE: "password"
+  KAFKA_CONSUMER_GROUP: "uamAuditAdaperServiceConsumer"
+  KAFKA_CLIENT_ID: "uamAuditAdaperServiceClient"
+  #KAFKA_AUTH_TYPE: "password"
+  KAFKA_AUTH_TYPE: "none"
   KAFKA_MAX_MSG_BYTES: "100000"
   KAFKA_CONSUMER_RETRY_INTERVAL: "200ms"
   KAFKA_VERSION: "1.0"
-  KAFKA_DISABLE_TLS: 'false'
+  KAFKA_DISABLE_TLS: 'true'
   KAFKA_AUTH_REQUIRED: 'false'
   KAFKA_RETRY_INTERVAL: "10s"
   KAFKA_MAX_RETRY_COUNT: "3"
   KAFKA_SASL_MECHANISM: "SHA-512"
   KAFKA_SASL_USERNAME: "KAFKA_SASL_USERNAME"
   KAFKA_SASL: "scram_sha512"
-  KAFKA_TLS: "enable"
+  #KAFKA_TLS: "enable"
+  
+  
   HIKARI_MIN_IDLE: "1"
-  HIKARI_MAX_IDLE: "0"
+  #HIKARI_MAX_IDLE: "5"
   HIKARI_MAX_POOL_SIZE: "5"
   HIKARI_POOL_NAME: "uam-adapter"
   HIKARI_CONNECTION_TIME_OUT: "60000"
@@ -87,6 +101,7 @@ envValues:
   HIKARI_AUTO_COMMIT: 'false'
   HIKARI_IDLE_TIME_OUT: "60000"
   HIKARI_KEEP_ALIVE_TIME: "60000"
+  
   ERROR_TEMPLATE_QUERY: "select * from uam_error_code_mapping where uamerrorcode=:uamerrorcode"  
   RULE_CONFIG_QUERY: "select rules from uam_mapping_rule where service_nm=:serviceNm and rule_purpose=:rulePurpose and version =:version"
   ROUTING_TEMPLATE_QUERY: "select * from routing_decision_table where appName=:appname"
@@ -128,19 +143,12 @@ global:
 
 ingress:
   enabled: false
-  className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  backendPortNumber: 10085
+  annotations:
+    kubernetes.io/ingress.class: gce-internal
+    kubernetes.io/ingress.regional-static-ip-name: hbl-gcp-imps-in-out-perf-pcidss-simplified-flow-ilb-ip
+    kubernetes.io/ingress.allow-http: 'false'
+    ingress.gcp.kubernetes.io/pre-shared-cert: hbl-gcp-uat-imps-as1-simulator-cert
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious

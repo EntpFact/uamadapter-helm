@@ -32,17 +32,15 @@ spec:
       value: {{ .Values.envValues.KAFKA_SASL_MECHANISM }}
     - name: saslUsername
       value: {{ .Values.envValues.KAFKA_SASL_USERNAME }}
-    - name: saslPassword
-      secretKeyRef:
-        name: uam-adapter-cloud-secret
-        key: saslPassword
-    - name: caCert
-      secretKeyRef:
-        name: uam-adapter-cloud-secret
-        key: caCert
+ #   - name: saslPassword
+ #     secretKeyRef:
+ #       name: uam-adapter-cloud-secret
+  #      key: saslPassword
+  #  - name: caCert
+  #    secretKeyRef:
+  #      name: uam-adapter-cloud-secret
+  #      key: caCert
     - name: sasl
       value: {{ .Values.envValues.KAFKA_SASL }}
-    - name: tls
-      value: {{ .Values.envValues.KAFKA_TLS }}
-        
-      
+  #  - name: tls
+  #    value: {{ .Values.envValues.KAFKA_TLS }}

@@ -4,6 +4,7 @@ metadata:
   name: {{ include "prarambh-uam-adapter-helm.fullname" . }}
   labels:
     {{- include "prarambh-uam-adapter-helm.labels" . | nindent 4 }}
+
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
@@ -24,44 +25,70 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ .Values.serviceAccount.name }}
+      serviceAccountName: workload-service-account
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            allowPrivilegeEscalation: {{ .Values.securityContext.allowPrivilegeEscalation | default false }}
+            capabilities:
+              drop: 
+              - "ALL"
+            readOnlyRootFilesystem: {{ .Values.securityContext.readOnlyRootFilesystem | default true }}
+            runAsNonRoot: {{ .Values.securityContext.runAsNonRoot | default true }}
+            runAsUser: {{ .Values.securityContext.runAsUser | default 10005 }}
+            runAsGroup: {{ .Values.securityContext.runAsGroup | default 10005 }}
+            privileged: {{ .Values.securityContext.privileged | default false }}
+            seccompProfile:
+              type: {{ .Values.securityContext.seccompProfile }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           envFrom:
             - configMapRef:
                 name: {{ .Values.envFrom.uamAdapterConfigMap }}
           volumeMounts:
+            - name: pre-install
+              mountPath: "/tmp"
             - name: uam-adapter-secret-store-volume
               mountPath: "/uam/adapter/secret"
-              readOnly: true
+              #readOnly: true
           env:
-            - name: db_password
+            - name: ApplicationName
+              value: {{ .Values.envValues.APPLICATION_NAME }}
+            - name: port
+              value: {{ .Values.envValues.APPLICATION_PORT | quote }}
+            - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   key: dbPassword
                   name: uam-adapter-cloud-secret
+
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://{{ .Values.envValues.DB_HOST }}:{{ .Values.envValues.DB_PORT }}/{{ .Values.envValues.DB_DATABASE_NAME }}?ApplicationName={{ .Values.envValues.APPLICATION_NAME }}&currentSchema={{ .Values.envValues.DB_SCHEMA_NAME }}
+            - name: SPRING_DATASOURCE_USERNAME
+              value: {{ .Values.envValues.DB_USER_NAME }}
+            - name: DATASOURCE_SCHEMA
+              value: {{ .Values.envValues.DB_SCHEMA_NAME }}
+            - name: KAFKA_PUBSUBNAME
+              value: {{ .Values.envValues.KAFKA_PUBSUBNAME }}
+
           ports:
             - name: http
               containerPort: {{ .Values.service.port | int }}
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: {{ .Values.service.port | int }}
-            initialDelaySeconds: 10
-            periodSeconds: 5
-          readinessProbe:
-            httpGet:
-              path: /ready
-              port: {{ .Values.service.port | int }}
-            initialDelaySeconds: 20
-            periodSeconds: 5
+  #        livenessProbe:
+  #          httpGet:
+  #            path: /healthz
+   #           port: {{ .Values.service.port | int }}
+   #         initialDelaySeconds: 10
+   #         periodSeconds: 5
+   #       readinessProbe:
+   #         httpGet:
+   #           path: /ready
+   #           port: {{ .Values.service.port | int }}
+   #         initialDelaySeconds: 20
+   #         periodSeconds: 5
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
@@ -77,6 +104,8 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
+        - name: pre-install
+          emptyDir: {}
         - name: uam-adapter-secret-store-volume
           csi:
             driver: secrets-store.csi.k8s.io

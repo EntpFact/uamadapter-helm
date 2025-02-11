@@ -3,10 +3,10 @@ kind: ConfigMap
 metadata:
   name: uam-adapter-configmap
 data:
-  port: {{ .Values.service.port | quote }}
-  application_name: {{ .Values.envValues.APPLICATION_NAME | quote }}
+  server_port: {{ .Values.envValues.PORT | quote }}
   dapr_service_enable: {{ .Values.envValues.DAPR_SERVICE_ENABLE | quote }}
   db_datasource_url: {{ .Values.envValues.SPRING_DATASOURCE_URL | quote }}
+  db_datasource_driver: {{ .Values.envValues.SPRING_DATASOURCE_DRIVERCLASSNAME | quote }}
   db_user_name: {{ .Values.envValues.SPRING_DATASOURCE_USERNAME | quote }}
   hikari_min_idle: {{ .Values.envValues.HIKARI_MIN_IDLE | quote }}
   hikari_max_idle: {{ .Values.envValues.HIKARI_MAX_IDLE | quote }}
